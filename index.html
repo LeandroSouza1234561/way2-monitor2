@@ -6,17 +6,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:#1a1e28}
+html,body{height:100%;overflow:hidden;background:#d0d4dc}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 
 /* ── LOADING ── */
-#ls{position:fixed;inset:0;background:#1a1e28;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:6px}
+#ls{position:fixed;inset:0;background:#d0d4dc;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:6px}
 .ls-logo{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:800;letter-spacing:8px;color:#c05800}
-.ls-sub{font-size:10px;letter-spacing:5px;color:#3a4458;text-transform:uppercase;margin-bottom:24px}
+.ls-sub{font-size:10px;letter-spacing:5px;color:#6a7080;text-transform:uppercase;margin-bottom:24px}
 .ls-sp{width:28px;height:28px;border:2px solid #2a3040;border-top-color:#c05800;border-radius:50%;animation:spin .7s linear infinite}
-.ls-msg{font-size:11px;color:#3a4458;margin-top:6px}
+.ls-msg{font-size:11px;color:#6a7080;margin-top:6px}
 
 /* ── APP: grid rígido sem scroll ── */
 #app{
@@ -117,7 +117,7 @@ html,body{height:100%;overflow:hidden;background:#1a1e28}
 .tc-bar-f{height:100%;border-radius:1px;transition:width .9s ease}
 
 /* status */
-.s-on{background:#22c55e}.s-of{background:#ef4444}.s-ld{background:#f59e0b;animation:pulse .9s infinite}
+.s-on{background:#22c55e}.s-of{background:#ef4444}.s-ld{background:#f59e0b}
 .p1 .v-on{color:#7ab0d8}.p1 .v-of{color:#ef4444}.p1 .v-ld{color:#f59e0b}
 .p2 .v-on{color:#fff}.p2 .v-of{color:#ffa0a0}.p2 .v-ld{color:#ffe090}
 .b-on{background:linear-gradient(90deg,#15803d,#22c55e)}.b-of{background:#ef4444}.b-ld{background:#f59e0b}
@@ -135,11 +135,11 @@ html,body{height:100%;overflow:hidden;background:#1a1e28}
 
 /* ── CENTRO ── */
 .centro{
-  background:#161a24;
-  border-left:1px solid #0e1018;
-  border-right:1px solid #0e1018;
+  background:#c8ccd4;
+  border-left:1px solid #a0a8b4;
+  border-right:1px solid #a0a8b4;
   display:grid;
-  grid-template-rows:auto auto auto auto auto auto auto;
+  grid-template-rows:auto auto auto auto auto;
   padding:8px;
   gap:5px;
   overflow:hidden;
@@ -273,14 +273,7 @@ footer{
         <div class="c-s-val" id="soma-g1">–<span class="c-s-un">MW</span></div>
       </div>
 
-      <div class="c-fluxo">
-        <div class="c-fi">⚙️</div><div class="c-fa">→</div>
-        <div class="c-fi">📡</div><div class="c-fa">→</div>
-        <div class="c-fi">⚙️</div><div class="c-fa">→</div>
-        <div class="c-fi">🏭</div><div class="c-fa">→</div>
-        <div class="c-fi">🏗️</div>
-      </div>
-      <div class="c-fl">Somatória Total</div>
+
 
       <div class="c-soma s2">
         <div class="c-s-lbl">Somatória GNA 2</div>
