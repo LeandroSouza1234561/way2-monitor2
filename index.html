@@ -7,35 +7,15 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:#d0d4dc}
-
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-
-/* ── LOADING ── */
 #ls{position:fixed;inset:0;background:#d0d4dc;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:6px}
 .ls-logo{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:800;letter-spacing:8px;color:#c05800}
 .ls-sub{font-size:10px;letter-spacing:5px;color:#6a7080;text-transform:uppercase;margin-bottom:24px}
-.ls-sp{width:28px;height:28px;border:2px solid #2a3040;border-top-color:#c05800;border-radius:50%;animation:spin .7s linear infinite}
+.ls-sp{width:28px;height:28px;border:2px solid #a0a8b4;border-top-color:#c05800;border-radius:50%;animation:spin .7s linear infinite}
 .ls-msg{font-size:11px;color:#6a7080;margin-top:6px}
-
-/* ── APP: grid rígido sem scroll ── */
-#app{
-  display:none;
-  height:100vh;
-  width:100vw;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-/* ── TOPO fino ── */
-.topo{
-  height:44px;
-  background:#12151e;
-  border-bottom:2px solid #c05800;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;
-  flex-shrink:0;
-}
+#app{display:none;height:100vh;width:100vw;flex-direction:column;overflow:hidden}
+.topo{height:44px;background:#12151e;border-bottom:2px solid #c05800;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
 .t-left{display:flex;align-items:center;gap:14px}
 .t-logo{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:3px;color:#c05800}
 .t-div{width:1px;height:20px;background:#2a3040}
@@ -47,62 +27,28 @@ html,body{height:100%;overflow:hidden;background:#d0d4dc}
 .t-status{display:flex;align-items:center;gap:5px;font-size:9px;color:#3a4a5a}
 .t-sbar{width:40px;height:2px;background:#2a3040;border-radius:1px;overflow:hidden}
 .t-sfill{height:100%;background:#c05800}
-
-/* ── CORPO: 3 colunas ── */
-.body{
-  display:grid;
-  grid-template-columns:1fr 220px 1fr;
-  flex:1;
-  min-height:0;
-  overflow:hidden;
-}
-
-/* ── PAINÉIS LATERAIS ── */
-.p1,.p2{
-  display:grid;
-  grid-template-rows:36px repeat(4,1fr) 80px;
-  padding:8px 10px;
-  gap:5px;
-  overflow:hidden;
-}
+.body{display:grid;grid-template-columns:1fr 220px 1fr;flex:1;min-height:0;overflow:hidden}
+.p1,.p2{display:grid;grid-template-rows:36px repeat(4,1fr) 80px;padding:8px 10px;gap:5px;overflow:hidden}
 .p1{background:#1e2330;border-right:1px solid #0e1018}
 .p2{background:#a04808;border-left:1px solid #0e1018}
-
-/* ── HEADER PAINEL ── */
-.p-hdr{
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:16px;font-weight:700;letter-spacing:5px;text-transform:uppercase;
-  border-radius:3px;
-}
+.p-hdr{display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:5px;text-transform:uppercase;border-radius:3px}
 .p1 .p-hdr{color:#6a8aaa;background:#161a24;border:1px solid #2a3a4a}
 .p2 .p-hdr{color:#fff;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.12)}
-
-/* ── CARD TURBINA ── */
-.tc{
-  border-radius:4px;
-  padding:6px 10px;
-  display:flex;flex-direction:column;justify-content:center;
-  position:relative;overflow:hidden;
-  min-height:0;
-}
+.tc{border-radius:4px;padding:6px 10px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;min-height:0}
 .p1 .tc{background:#12151e;border:1px solid #1e2a38}
 .p2 .tc{background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.1)}
 .tc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px}
 .p1 .tc.gas::before{background:linear-gradient(90deg,transparent,#3a6a9a,transparent)}
 .p1 .tc.vapor::before{background:linear-gradient(90deg,transparent,#5a4a80,transparent)}
 .p2 .tc::before{background:linear-gradient(90deg,transparent,rgba(255,220,120,.5),transparent)}
-
 .tc-row1{display:flex;align-items:center;justify-content:space-between}
 .tc-tipo{font-size:7px;letter-spacing:2px;text-transform:uppercase;font-weight:600}
 .p1 .tc-tipo{color:#2a3a4a}
 .p2 .tc-tipo{color:rgba(255,255,255,.35)}
 .tc-dot{width:6px;height:6px;border-radius:50%}
-
 .tc-nome{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
 .p1 .tc-nome{color:#3a5878}
 .p2 .tc-nome{color:rgba(255,255,255,.5)}
-
 .tc-val-row{display:flex;align-items:baseline;gap:3px}
 .tc-val{font-family:'Share Tech Mono',monospace;font-size:26px;line-height:1}
 .p1 .tc-val{color:#7ab0d8}
@@ -110,19 +56,14 @@ html,body{height:100%;overflow:hidden;background:#d0d4dc}
 .tc-un{font-size:10px;font-weight:300}
 .p1 .tc-un{color:#2a3a4a}
 .p2 .tc-un{color:rgba(255,255,255,.35)}
-
 .tc-bar{margin-top:4px;height:2px;border-radius:1px;overflow:hidden}
 .p1 .tc-bar{background:rgba(255,255,255,.05)}
 .p2 .tc-bar{background:rgba(0,0,0,.2)}
 .tc-bar-f{height:100%;border-radius:1px;transition:width .9s ease}
-
-/* status */
 .s-on{background:#22c55e}.s-of{background:#ef4444}.s-ld{background:#f59e0b}
 .p1 .v-on{color:#7ab0d8}.p1 .v-of{color:#ef4444}.p1 .v-ld{color:#f59e0b}
 .p2 .v-on{color:#fff}.p2 .v-of{color:#ffa0a0}.p2 .v-ld{color:#ffe090}
 .b-on{background:linear-gradient(90deg,#15803d,#22c55e)}.b-of{background:#ef4444}.b-ld{background:#f59e0b}
-
-/* ── MINI CHART INFERIOR ── */
 .mc{border-radius:4px;padding:6px 8px;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
 .p1 .mc{background:#0e1118;border:1px solid #1a2230}
 .p2 .mc{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.08)}
@@ -132,78 +73,40 @@ html,body{height:100%;overflow:hidden;background:#d0d4dc}
 .mc-val{font-family:'Share Tech Mono',monospace;font-size:11px}
 .p1 .mc-val{color:#4a7a9a}
 .p2 .mc-val{color:#e8c060}
-
-/* ── CENTRO ── */
-.centro{
-  background:#c8ccd4;
-  border-left:1px solid #a0a8b4;
-  border-right:1px solid #a0a8b4;
-  display:grid;
-  grid-template-rows:auto auto auto auto auto;
-  padding:8px;
-  gap:5px;
-  overflow:hidden;
-}
-
-.c-total{
-  background:#12151e;
-  border:1px solid #1e2a38;
-  border-top:2px solid #c05800;
-  border-radius:4px;
-  padding:8px 10px;
-  text-align:center;
-}
-.c-t-l1{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#2a3a4a;margin-bottom:1px}
+.centro{background:#c8ccd4;border-left:1px solid #a0a8b4;border-right:1px solid #a0a8b4;display:grid;grid-template-rows:auto auto auto auto auto;padding:8px;gap:5px;overflow:hidden}
+.c-total{background:#1a1e2a;border:1px solid #1e2a38;border-top:2px solid #c05800;border-radius:4px;padding:8px 10px;text-align:center}
+.c-t-l1{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:1px}
 .c-t-l2{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#c05800;font-weight:600;margin-bottom:4px}
 .c-t-val{font-family:'Share Tech Mono',monospace;font-size:32px;color:#d88010;line-height:1}
-.c-t-un{font-size:11px;color:#2a3a4a;margin-left:3px}
-.c-t-sync{font-size:7px;letter-spacing:1px;color:#1e2830;margin-top:3px;text-transform:uppercase}
-
-.c-soma{background:#12151e;border:1px solid #1e2a38;border-radius:4px;padding:6px 10px;text-align:center}
-.c-s-lbl{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#2a3a4a;margin-bottom:2px}
+.c-t-un{font-size:11px;color:#3a4a5a;margin-left:3px}
+.c-t-sync{font-size:7px;letter-spacing:1px;color:#6a7a8a;margin-top:3px;text-transform:uppercase}
+.c-soma{background:#1a1e2a;border:1px solid #1e2a38;border-radius:4px;padding:6px 10px;text-align:center}
+.c-s-lbl{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:2px}
 .c-s-val{font-family:'Share Tech Mono',monospace;font-size:18px;line-height:1}
 .c-soma.s1 .c-s-val{color:#4a8ab0}
 .c-soma.s2 .c-s-val{color:#c88020}
-.c-s-un{font-size:9px;color:#1e2830;margin-left:2px}
-
-.c-fluxo{display:flex;align-items:center;justify-content:center;gap:3px}
-.c-fi{width:20px;height:20px;border-radius:3px;background:#0e1118;border:1px solid #1e2830;display:flex;align-items:center;justify-content:center;font-size:9px}
-.c-fa{color:#1e2830;font-size:8px}
-.c-fl{font-size:6px;letter-spacing:2px;color:#1a2430;text-transform:uppercase;text-align:center;margin-top:-2px}
-
-.c-efic{background:#12151e;border:1px solid #1e2a38;border-radius:4px;padding:6px 8px;flex:1}
-.c-el{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#2a3a4a;margin-bottom:4px}
+.c-s-un{font-size:9px;color:#3a4a5a;margin-left:2px}
+.c-efic{background:#1a1e2a;border:1px solid #1e2a38;border-radius:4px;padding:6px 8px}
+.c-el{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:4px}
 .c-ea{display:flex;justify-content:space-between;margin-top:2px}
-.c-ea span{font-size:6px;color:#1a2430;font-family:monospace}
-
-.c-mc{background:#0e1118;border:1px solid #1a2230;border-radius:4px;padding:6px 8px}
-.c-mc-l{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#2a3a4a;margin-bottom:2px}
+.c-ea span{font-size:6px;color:#3a4a5a;font-family:monospace}
+.c-mc{background:#141820;border:1px solid #1e2a38;border-radius:4px;padding:6px 8px}
+.c-mc-l{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:2px}
 .c-mc-v{font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a7a9a;margin-bottom:2px}
-
-/* ── FOOTER ── */
-footer{
-  height:24px;flex-shrink:0;
-  background:#0e1118;
-  border-top:1px solid #c05800;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;font-size:9px;color:#1e2830;
-}
-.ft-l{display:flex;align-items:center;gap:8px;color:#3a5068}
+footer{height:24px;flex-shrink:0;background:#0e1118;border-top:1px solid #c05800;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:9px;color:#3a4a5a}
+.ft-l{display:flex;align-items:center;gap:8px;color:#4a6070}
 .ft-p{width:80px;height:1px;background:#1e2830;overflow:hidden}
 .ft-b{height:100%;background:#c05800;transition:width 1s linear}
 </style>
 </head>
 <body>
-
 <div id="ls">
   <div class="ls-logo">WAY2</div>
   <div class="ls-sub">Complexo GNA · Monitor Executivo</div>
   <div class="ls-sp"></div>
   <div class="ls-msg" id="lsmsg">Conectando...</div>
 </div>
-
 <div class="app" id="app">
-
   <div class="topo">
     <div class="t-left">
       <div class="t-logo">WAY2</div>
@@ -216,185 +119,65 @@ footer{
       <div id="clk">--:--:--</div>
     </div>
   </div>
-
   <div class="body">
-
-    <!-- GNA 1 -->
     <div class="p1">
       <div class="p-hdr">GNA 1</div>
-
-      <div class="tc gas">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT11"></div></div>
-        <div class="tc-nome">GT11</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-GT11">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT11" style="width:0%"></div></div>
-      </div>
-
-      <div class="tc gas">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT12"></div></div>
-        <div class="tc-nome">GT12</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-GT12">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT12" style="width:0%"></div></div>
-      </div>
-
-      <div class="tc gas">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT13"></div></div>
-        <div class="tc-nome">GT13</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-GT13">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT13" style="width:0%"></div></div>
-      </div>
-
-      <div class="tc vapor">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Vapor</span><div class="tc-dot s-ld" id="dot-ST10"></div></div>
-        <div class="tc-nome">ST10</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-ST10">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-ST10" style="width:0%"></div></div>
-      </div>
-
-      <div class="mc">
-        <div class="mc-lbl">Tendência de Geração (MW)</div>
-        <div class="mc-val" id="mc-g1">– MW</div>
-        <canvas id="ch-g1" style="width:100%;height:36px"></canvas>
-      </div>
+      <div class="tc gas"><div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT11"></div></div><div class="tc-nome">GT11</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-GT11">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT11" style="width:0%"></div></div></div>
+      <div class="tc gas"><div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT12"></div></div><div class="tc-nome">GT12</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-GT12">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT12" style="width:0%"></div></div></div>
+      <div class="tc gas"><div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT13"></div></div><div class="tc-nome">GT13</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-GT13">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT13" style="width:0%"></div></div></div>
+      <div class="tc vapor"><div class="tc-row1"><span class="tc-tipo">Turbina a Vapor</span><div class="tc-dot s-ld" id="dot-ST10"></div></div><div class="tc-nome">ST10</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-ST10">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-ST10" style="width:0%"></div></div></div>
+      <div class="mc"><div class="mc-lbl">Tendência de Geração (MW)</div><div class="mc-val" id="mc-g1">– MW</div><canvas id="ch-g1" style="width:100%;height:36px"></canvas></div>
     </div>
-
-    <!-- CENTRO -->
     <div class="centro">
-      <div class="c-total">
-        <div class="c-t-l1">Somatória GNA Total</div>
-        <div class="c-t-l2">GNA TOTAL (MW)</div>
-        <div><span class="c-t-val" id="total-mw">–</span><span class="c-t-un">MW</span></div>
-        <canvas id="ch-tot" style="width:100%;height:28px;margin-top:4px"></canvas>
-        <div class="c-t-sync">GNA Performance Sync</div>
-      </div>
-
-      <div class="c-soma s1">
-        <div class="c-s-lbl">Somatória GNA 1</div>
-        <div class="c-s-val" id="soma-g1">–<span class="c-s-un">MW</span></div>
-      </div>
-
-
-
-      <div class="c-soma s2">
-        <div class="c-s-lbl">Somatória GNA 2</div>
-        <div class="c-s-val" id="soma-g2">–<span class="c-s-un">MW</span></div>
-      </div>
-
-      <div class="c-efic">
-        <div class="c-el">Eficiência do Complexo GNA</div>
-        <canvas id="ch-efic" style="width:100%;height:52px"></canvas>
-        <div class="c-ea"><span>I</span><span>II</span><span>III</span><span>M</span><span>I</span><span>V</span><span>VI</span><span>M</span></div>
-      </div>
-
-      <div class="c-mc">
-        <div class="c-mc-l">Eficiência</div>
-        <div class="c-mc-v" id="mc-ef">– MW</div>
-        <canvas id="ch-efic2" style="width:100%;height:28px"></canvas>
-      </div>
+      <div class="c-total"><div class="c-t-l1">Somatória GNA Total</div><div class="c-t-l2">GNA TOTAL (MW)</div><div><span class="c-t-val" id="total-mw">–</span><span class="c-t-un">MW</span></div><canvas id="ch-tot" style="width:100%;height:28px;margin-top:4px"></canvas><div class="c-t-sync">GNA Performance Sync</div></div>
+      <div class="c-soma s1"><div class="c-s-lbl">Somatória GNA 1</div><div class="c-s-val" id="soma-g1">–<span class="c-s-un">MW</span></div></div>
+      <div class="c-soma s2"><div class="c-s-lbl">Somatória GNA 2</div><div class="c-s-val" id="soma-g2">–<span class="c-s-un">MW</span></div></div>
+      <div class="c-efic"><div class="c-el">Eficiência do Complexo GNA</div><canvas id="ch-efic" style="width:100%;height:52px"></canvas><div class="c-ea"><span>I</span><span>II</span><span>III</span><span>M</span><span>I</span><span>V</span><span>VI</span><span>M</span></div></div>
+      <div class="c-mc"><div class="c-mc-l">Eficiência</div><div class="c-mc-v" id="mc-ef">– MW</div><canvas id="ch-efic2" style="width:100%;height:28px"></canvas></div>
     </div>
-
-    <!-- GNA 2 -->
     <div class="p2">
       <div class="p-hdr">GNA 2</div>
-
-      <div class="tc">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT21"></div></div>
-        <div class="tc-nome">GT21</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-GT21">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT21" style="width:0%"></div></div>
-      </div>
-
-      <div class="tc">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT22"></div></div>
-        <div class="tc-nome">GT22</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-GT22">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT22" style="width:0%"></div></div>
-      </div>
-
-      <div class="tc">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT23"></div></div>
-        <div class="tc-nome">GT23</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-GT23">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT23" style="width:0%"></div></div>
-      </div>
-
-      <div class="tc">
-        <div class="tc-row1"><span class="tc-tipo">Turbina a Vapor</span><div class="tc-dot s-ld" id="dot-ST20"></div></div>
-        <div class="tc-nome">ST20</div>
-        <div class="tc-val-row"><span class="tc-val v-ld" id="val-ST20">–</span><span class="tc-un">MW</span></div>
-        <div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-ST20" style="width:0%"></div></div>
-      </div>
-
-      <div class="mc">
-        <div class="mc-lbl">Tendência de Geração (MW)</div>
-        <div class="mc-val" id="mc-g2">– MW</div>
-        <canvas id="ch-g2" style="width:100%;height:36px"></canvas>
-      </div>
+      <div class="tc"><div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT21"></div></div><div class="tc-nome">GT21</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-GT21">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT21" style="width:0%"></div></div></div>
+      <div class="tc"><div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT22"></div></div><div class="tc-nome">GT22</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-GT22">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT22" style="width:0%"></div></div></div>
+      <div class="tc"><div class="tc-row1"><span class="tc-tipo">Turbina a Gás</span><div class="tc-dot s-ld" id="dot-GT23"></div></div><div class="tc-nome">GT23</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-GT23">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-GT23" style="width:0%"></div></div></div>
+      <div class="tc"><div class="tc-row1"><span class="tc-tipo">Turbina a Vapor</span><div class="tc-dot s-ld" id="dot-ST20"></div></div><div class="tc-nome">ST20</div><div class="tc-val-row"><span class="tc-val v-ld" id="val-ST20">–</span><span class="tc-un">MW</span></div><div class="tc-bar"><div class="tc-bar-f b-ld" id="bar-ST20" style="width:0%"></div></div></div>
+      <div class="mc"><div class="mc-lbl">Tendência de Geração (MW)</div><div class="mc-val" id="mc-g2">– MW</div><canvas id="ch-g2" style="width:100%;height:36px"></canvas></div>
     </div>
-
-  </div><!-- /body -->
-
+  </div>
   <footer>
     <div class="ft-l">↺ <span id="ft-txt">Aguardando...</span></div>
     <div class="ft-p"><div class="ft-b" id="prog" style="width:100%"></div></div>
     <div>GNA Complex Performance Sync · 10s</div>
   </footer>
-
-</div><!-- /app -->
-
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const PROXY='https://way2-monitor2.vercel.app';
 const MED={
-  GNA1:[{id:'2562',nome:'GT11',nom:185,p:1},{id:'2565',nome:'GT12',nom:185,p:1},{id:'2566',nome:'GT13',nom:185,p:1},{id:'2567',nome:'ST10',nom:353,p:1}],
-  GNA2:[{id:'5679',nome:'GT21',nom:440,p:2},{id:'5690',nome:'GT22',nom:440,p:2},{id:'5691',nome:'GT23',nom:440,p:2},{id:'5693',nome:'ST20',nom:353,p:2}]
+  GNA1:[{id:'2562',nome:'GT11',nom:185},{id:'2565',nome:'GT12',nom:185},{id:'2566',nome:'GT13',nom:185},{id:'2567',nome:'ST10',nom:353}],
+  GNA2:[{id:'5679',nome:'GT21',nom:440},{id:'5690',nome:'GT22',nom:440},{id:'5691',nome:'GT23',nom:440},{id:'5693',nome:'ST20',nom:353}]
 };
-const GRANDEZA=7;
 const R={};let cd=10,cdId=null;const CH={};
-
 setInterval(()=>document.getElementById('clk').textContent=new Date().toLocaleTimeString('pt-BR'),1000);
-
-function mkL(id,c){
-  const cv=document.getElementById(id);
-  cv.height=cv.parentElement.offsetHeight||36;
-  return new Chart(cv,{type:'line',data:{labels:Array(20).fill(''),datasets:[{data:Array(20).fill(0),borderColor:c,borderWidth:1.5,fill:true,backgroundColor:c+'18',tension:.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:400}}});
-}
-function mkE(id){
-  return new Chart(document.getElementById(id),{type:'line',data:{labels:['I','II','III','M','I','V','VI','M'],datasets:[{data:[88,90,92,91,93,91,94,95],borderColor:'#c05800',borderWidth:1.5,fill:true,backgroundColor:'rgba(192,88,0,.1)',tension:.4,pointRadius:2,pointBackgroundColor:'#c05800'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#1a2430',font:{size:6}},grid:{color:'rgba(255,255,255,.03)'}},y:{min:70,max:100,ticks:{color:'#1a2430',font:{size:6},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.03)'}}},animation:{duration:400}}});
-}
+function mkL(id,c){return new Chart(document.getElementById(id),{type:'line',data:{labels:Array(20).fill(''),datasets:[{data:Array(20).fill(0),borderColor:c,borderWidth:1.5,fill:true,backgroundColor:c+'18',tension:.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:400}}})}
+function mkE(id){return new Chart(document.getElementById(id),{type:'line',data:{labels:['I','II','III','M','I','V','VI','M'],datasets:[{data:[88,90,92,91,93,91,94,95],borderColor:'#c05800',borderWidth:1.5,fill:true,backgroundColor:'rgba(192,88,0,.1)',tension:.4,pointRadius:2,pointBackgroundColor:'#c05800'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#3a4a5a',font:{size:6}},grid:{color:'rgba(0,0,0,.05)'}},y:{min:70,max:100,ticks:{color:'#3a4a5a',font:{size:6},callback:v=>v+'%'},grid:{color:'rgba(0,0,0,.05)'}}},animation:{duration:400}}})}
 function ap(k,v){const c=CH[k];if(!c)return;c.data.datasets[0].data.push(v);if(c.data.datasets[0].data.length>20)c.data.datasets[0].data.shift();c.data.labels=c.data.datasets[0].data.map((_,i)=>i);c.update('none')}
-
-window.addEventListener('load',()=>{
-  CH.tot=mkL('ch-tot','#d88010');
-  CH.g1=mkL('ch-g1','#4a8ab0');
-  CH.g2=mkL('ch-g2','#e0a040');
-  CH.e1=mkE('ch-efic');
-  CH.e2=mkE('ch-efic2');
-});
-
+window.addEventListener('load',()=>{CH.tot=mkL('ch-tot','#d88010');CH.g1=mkL('ch-g1','#4a8ab0');CH.g2=mkL('ch-g2','#e0a040');CH.e1=mkE('ch-efic');CH.e2=mkE('ch-efic2')});
 async function init(){
   setMsg('Conectando...');
   try{
     const r=await fetch(`${PROXY}/api/proxy?path=status`,{signal:AbortSignal.timeout(8000)});
     const d=await r.json();
-    if(d.ok){
-      setMsg('Carregando...');
-      document.getElementById('ls').style.display='none';
-      document.getElementById('app').style.display='flex';
-      await fetchAll();
-      setInterval(fetchAll,10000);
-      startCD();
-    }else throw 0;
+    if(d.ok){setMsg('Carregando...');document.getElementById('ls').style.display='none';document.getElementById('app').style.display='flex';await fetchAll();setInterval(fetchAll,10000);startCD();}
+    else throw 0;
   }catch{setMsg('❌ Proxy offline.');}
 }
 function setMsg(t){document.getElementById('lsmsg').textContent=t}
-
 async function fetchAll(){
-  document.getElementById('ft-txt').textContent='Buscando...';
-  cd=10;
+  document.getElementById('ft-txt').textContent='Buscando...';cd=10;
   const todos=[...MED.GNA1,...MED.GNA2];
   const params=todos.map(m=>`medidores=${m.id}`).join('&');
-  const url=`AreaTempoReal/AcompanhamentoTempoReal/Liste?primeiraLeitura=true&${params}&grandezas=${GRANDEZA}`;
+  const url=`AreaTempoReal/AcompanhamentoTempoReal/Liste?primeiraLeitura=true&${params}&grandezas=7`;
   try{
     const r=await fetch(`${PROXY}/api/proxy?path=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(12000)});
     if(r.ok){const data=await r.json();processData(data,todos);}
@@ -403,19 +186,14 @@ async function fetchAll(){
   updateUI();
   document.getElementById('ft-txt').textContent='Atualizado: '+new Date().toLocaleTimeString('pt-BR');
 }
-
 function processData(data,todos){
   const regs=data?.content?.[0]?.registros||[];
   todos.forEach(m=>{
     const reg=regs.find(r=>String(r.medidorId)===String(m.id));
-    if(reg){
-      const mw=reg.potenciaAtiva!=null?+reg.potenciaAtiva:null;
-      const st=reg.status?.item2||'Offline';
-      R[m.id]={mw,status:st==='Online'?'online':st==='Carregando'?'loading':'offline'};
-    }else{R[m.id]={mw:null,status:'offline'};}
+    if(reg){const mw=reg.potenciaAtiva!=null?+reg.potenciaAtiva:null;const st=reg.status?.item2||'Offline';R[m.id]={mw,status:st==='Online'?'online':st==='Carregando'?'loading':'offline'};}
+    else R[m.id]={mw:null,status:'offline'};
   });
 }
-
 function updateUI(){
   let s1=0,s2=0;
   MED.GNA1.forEach(m=>{const r=R[m.id];if(r?.status==='online'&&r.mw!=null)s1+=r.mw;updCard(m,r);});
@@ -429,7 +207,6 @@ function updateUI(){
   document.getElementById('mc-ef').textContent=fmt(tot)+' MW';
   ap('tot',tot);ap('g1',s1);ap('g2',s2);
 }
-
 function updCard(m,r){
   const dot=document.getElementById(`dot-${m.nome}`);
   const val=document.getElementById(`val-${m.nome}`);
@@ -445,7 +222,6 @@ function updCard(m,r){
   bar.className=`tc-bar-f b-${sc}`;
   bar.style.width=pct+'%';
 }
-
 function fmt(n){if(n==null||isNaN(n))return'–';return n.toLocaleString('pt-BR',{maximumFractionDigits:1})}
 function startCD(){cd=10;clearInterval(cdId);cdId=setInterval(()=>{cd--;document.getElementById('prog').style.width=((cd/10)*100)+'%';if(cd<=0)cd=10},1000)}
 init();
