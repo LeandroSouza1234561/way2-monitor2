@@ -8,7 +8,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:#d0d4dc}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 #ls{position:fixed;inset:0;background:#d0d4dc;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:6px}
 .ls-logo{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:800;letter-spacing:8px;color:#c05800}
 .ls-sub{font-size:10px;letter-spacing:5px;color:#6a7080;text-transform:uppercase;margin-bottom:24px}
@@ -22,7 +21,7 @@ html,body{height:100%;overflow:hidden;background:#d0d4dc}
 .t-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8090a8}
 .t-right{display:flex;align-items:center;gap:16px}
 .t-sync{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:1px;color:#6a7888;text-transform:uppercase}
-.t-dot{width:5px;height:5px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite}
+.t-dot{width:5px;height:5px;border-radius:50%;background:#22c55e}
 #clk{font-family:'Share Tech Mono',monospace;font-size:14px;color:#c05800;letter-spacing:2px}
 .t-status{display:flex;align-items:center;gap:5px;font-size:9px;color:#6a7888}
 .t-sbar{width:40px;height:2px;background:#2a3040;border-radius:1px;overflow:hidden}
@@ -73,20 +72,20 @@ html,body{height:100%;overflow:hidden;background:#d0d4dc}
 .mc-val{font-family:'Share Tech Mono',monospace;font-size:11px}
 .p1 .mc-val{color:#8aaac8}
 .p2 .mc-val{color:#e8c060}
-.centro{background:#d0d4dc;border-left:2px solid #0e1018;border-right:2px solid #0e1018;display:grid;grid-template-rows:auto auto auto auto auto;padding:8px;gap:5px;overflow:hidden}
-.c-total{background:#1a1e2a;border:1px solid #1e2a38;border-top:2px solid #c05800;border-radius:4px;padding:8px 10px;text-align:center}
+.centro{background:#d0d4dc;border-left:2px solid #0e1018;border-right:2px solid #0e1018;display:grid;grid-template-rows:auto auto auto auto auto;padding:8px;gap:6px;overflow:hidden}
+.c-total{background:#1a1e2a;border:1px solid #1e2a38;border-top:2px solid #c05800;border-radius:4px;padding:10px;text-align:center}
 .c-t-l1{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:1px}
 .c-t-l2{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#c05800;font-weight:600;margin-bottom:4px}
 .c-t-val{font-family:'Share Tech Mono',monospace;font-size:32px;color:#d88010;line-height:1}
 .c-t-un{font-size:11px;color:#3a4a5a;margin-left:3px}
 .c-t-sync{font-size:7px;letter-spacing:1px;color:#6a7a8a;margin-top:3px;text-transform:uppercase}
-.c-soma{background:#1a1e2a;border:1px solid #1e2a38;border-radius:4px;padding:6px 10px;text-align:center}
-.c-s-lbl{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:2px}
-.c-s-val{font-family:'Share Tech Mono',monospace;font-size:18px;line-height:1}
+.c-soma{background:#1a1e2a;border:1px solid #1e2a38;border-radius:4px;padding:8px 10px;text-align:center}
+.c-s-lbl{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:3px}
+.c-s-val{font-family:'Share Tech Mono',monospace;font-size:20px;line-height:1}
 .c-soma.s1 .c-s-val{color:#4a8ab0}
 .c-soma.s2 .c-s-val{color:#c88020}
 .c-s-un{font-size:9px;color:#3a4a5a;margin-left:2px}
-.c-efic{background:#1a1e2a;border:1px solid #1e2a38;border-radius:4px;padding:6px 8px}
+.c-efic{background:#1a1e2a;border:1px solid #1e2a38;border-radius:4px;padding:8px}
 .c-el{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#4a5a6a;margin-bottom:4px}
 .c-ea{display:flex;justify-content:space-between;margin-top:2px}
 .c-ea span{font-size:6px;color:#3a4a5a;font-family:monospace}
@@ -129,11 +128,11 @@ footer{height:24px;flex-shrink:0;background:#0e1118;border-top:1px solid #c05800
       <div class="mc"><div class="mc-lbl">Tendência de Geração (MW)</div><div class="mc-val" id="mc-g1">– MW</div><canvas id="ch-g1" style="width:100%;height:36px"></canvas></div>
     </div>
     <div class="centro">
-      <div class="c-total"><div class="c-t-l1">Somatória GNA Total</div><div class="c-t-l2">GNA TOTAL (MW)</div><div><span class="c-t-val" id="total-mw">–</span><span class="c-t-un">MW</span></div><canvas id="ch-tot" style="width:100%;height:28px;margin-top:4px"></canvas><div class="c-t-sync">GNA Performance Sync</div></div>
+      <div class="c-total"><div class="c-t-l1">Somatória GNA Total</div><div class="c-t-l2">GNA TOTAL (MW)</div><div><span class="c-t-val" id="total-mw">–</span><span class="c-t-un">MW</span></div><canvas id="ch-tot" style="width:100%;height:26px;margin-top:4px"></canvas><div class="c-t-sync">GNA Performance Sync</div></div>
       <div class="c-soma s1"><div class="c-s-lbl">Somatória GNA 1</div><div class="c-s-val" id="soma-g1">–<span class="c-s-un">MW</span></div></div>
       <div class="c-soma s2"><div class="c-s-lbl">Somatória GNA 2</div><div class="c-s-val" id="soma-g2">–<span class="c-s-un">MW</span></div></div>
       <div class="c-efic"><div class="c-el">Eficiência do Complexo GNA</div><canvas id="ch-efic" style="width:100%;height:52px"></canvas><div class="c-ea"><span>I</span><span>II</span><span>III</span><span>M</span><span>I</span><span>V</span><span>VI</span><span>M</span></div></div>
-      <div class="c-mc"><div class="c-mc-l">Eficiência</div><div class="c-mc-v" id="mc-ef">– MW</div><canvas id="ch-efic2" style="width:100%;height:28px"></canvas></div>
+      <div class="c-mc"><div class="c-mc-l">Eficiência</div><div class="c-mc-v" id="mc-ef">– MW</div><canvas id="ch-efic2" style="width:100%;height:26px"></canvas></div>
     </div>
     <div class="p2">
       <div class="p-hdr">GNA 2</div>
@@ -166,7 +165,7 @@ window.addEventListener('load',()=>{CH.tot=mkL('ch-tot','#d88010');CH.g1=mkL('ch
 async function init(){
   setMsg('Conectando...');
   try{
-    const r=await fetch(`${PROXY}/api/proxy?path=status`,{signal:AbortSignal.timeout(8000)});
+    const r=await fetch(`${PROXY}/?path=status`,{signal:AbortSignal.timeout(8000)});
     const d=await r.json();
     if(d.ok){setMsg('Carregando...');document.getElementById('ls').style.display='none';document.getElementById('app').style.display='flex';await fetchAll();setInterval(fetchAll,10000);startCD();}
     else throw 0;
@@ -179,7 +178,7 @@ async function fetchAll(){
   const params=todos.map(m=>`medidores=${m.id}`).join('&');
   const url=`AreaTempoReal/AcompanhamentoTempoReal/Liste?primeiraLeitura=true&${params}&grandezas=7`;
   try{
-    const r=await fetch(`${PROXY}/api/proxy?path=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(12000)});
+    const r=await fetch(`${PROXY}/?path=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(12000)});
     if(r.ok){const data=await r.json();processData(data,todos);}
     else todos.forEach(m=>{R[m.id]={mw:null,status:'offline'};});
   }catch{todos.forEach(m=>{R[m.id]={mw:null,status:'offline'};});}
