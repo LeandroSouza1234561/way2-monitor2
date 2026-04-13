@@ -1,77 +1,156 @@
 const https = require('https');
+const qs = require('querystring');
 
 const WAY2_HOST = 'pim.way2.com.br';
+const USERNAME  = 'leandro.souzagna';
+const PASSWORD  = 'Mudar@2026';
+const SESSION_TTL = 20 * 60 * 1000;
 
-// Cookies de sessão capturados do navegador
-// ATENÇÃO: Quando expirar, atualize estes valores com os novos cookies do navegador
-const STATIC_COOKIES = '.ASPXAUTH=E5EE983722A89C532295C3018E4C15C86D7E86CA2DEFEF09AB76672385562051012E395D9D4BB82476E38AE80C9F1F125D839F9B4EE5B397C0BE8C70E8A3B3715A1B2F301B73AF70BAF6E5CE0BFB6101599AC033F4EEFD3C674611402FD8DE9A2C5C98EB63ECB35D6D8D416105F3D5F4; ASP.NET_SessionId=gobfllvftiqb4khnzsnikmk5';
+let jar = {};
+let lastLogin = 0;
 
-const USERNAME = 'leandro.souzagna';
-
-function httpsReq(opts) {
+function req(opts, body) {
   return new Promise((resolve, reject) => {
-    const req = https.request(opts, res => {
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: data }));
+    const r = https.request(opts, res => {
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve({
+        status: res.statusCode,
+        headers: res.headers,
+        body: Buffer.concat(chunks).toString('utf8')
+      }));
     });
-    req.on('error', reject);
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
-    req.end();
+    r.on('error', reject);
+    r.setTimeout(12000, () => { r.destroy(); reject(new Error('timeout')); });
+    if (body) r.write(body);
+    r.end();
   });
 }
 
-module.exports = async (req, res) => {
+function cookieStr() {
+  return Object.entries(jar).map(([k,v]) => `${k}=${v}`).join('; ');
+}
+
+function parseCookies(h) {
+  const raw = h['set-cookie'];
+  if (!raw) return;
+  (Array.isArray(raw) ? raw : [raw]).forEach(c => {
+    const m = c.match(/^([^=]+)=([^;]*)/);
+    if (m) jar[m[1].trim()] = m[2].trim();
+  });
+}
+
+async function login() {
+  console.log('[Login] Iniciando...');
+  jar = {};
+
+  // 1) GET /login para pegar cookies iniciais e token CSRF
+  const g = await req({
+    hostname: WAY2_HOST, path: '/login', method: 'GET',
+    headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html,*/*', 'Accept-Language': 'pt-BR,pt;q=0.9' }
+  });
+  parseCookies(g.headers);
+
+  // Extrai token CSRF do HTML (vários formatos possíveis)
+  let token = '';
+  const patterns = [
+    /name="__RequestVerificationToken"[^>]*value="([^"]+)"/,
+    /name="_token"[^>]*value="([^"]+)"/,
+    /"token":"([^"]+)"/,
+    /AntiForgery[^"]*"([A-Za-z0-9+/=_-]{20,})"/,
+  ];
+  for (const p of patterns) {
+    const m = g.body.match(p);
+    if (m) { token = m[1]; break; }
+  }
+  console.log('[Login] GET status:', g.status, '| CSRF:', token ? 'sim' : 'não', '| Cookies:', Object.keys(jar));
+
+  // 2) POST /login
+  const fields = { username: USERNAME, password: PASSWORD };
+  if (token) fields['__RequestVerificationToken'] = token;
+  const body = qs.stringify(fields);
+
+  const p = await req({
+    hostname: WAY2_HOST, path: '/login', method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(body),
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120',
+      'Accept': 'text/html,application/xhtml+xml,*/*',
+      'Accept-Language': 'pt-BR,pt;q=0.9',
+      'Referer': `https://${WAY2_HOST}/login`,
+      'Origin': `https://${WAY2_HOST}`,
+      'Cookie': cookieStr(),
+    }
+  }, body);
+  parseCookies(p.headers);
+
+  console.log('[Login] POST status:', p.status, '| Location:', p.headers.location || '-', '| Cookies:', Object.keys(jar));
+
+  // Sucesso = redirect para dashboard (302/301) ou tem cookie de auth
+  const hasAuth = Object.keys(jar).some(k => k.toLowerCase().includes('auth') || k.toLowerCase().includes('session'));
+  const redirectOk = p.headers.location && !p.headers.location.includes('/login');
+
+  if (hasAuth || redirectOk || p.status === 302) {
+    // Segue redirect se necessário
+    if (p.headers.location) {
+      const loc = p.headers.location.startsWith('http') ? new URL(p.headers.location) : null;
+      const path = loc ? loc.pathname + (loc.search || '') : p.headers.location;
+      const f = await req({
+        hostname: WAY2_HOST, path, method: 'GET',
+        headers: { 'Cookie': cookieStr(), 'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html,*/*' }
+      });
+      parseCookies(f.headers);
+      console.log('[Login] Follow redirect:', path, f.status);
+    }
+    lastLogin = Date.now();
+    console.log('[Login] OK! Cookies:', Object.keys(jar));
+    return true;
+  }
+
+  console.error('[Login] Falhou. Body preview:', p.body.substring(0, 300));
+  return false;
+}
+
+async function ensureSession() {
+  if (Object.keys(jar).length > 0 && Date.now() - lastLogin < SESSION_TTL) return true;
+  return login();
+}
+
+module.exports = async (req2, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') { res.status(204).end(); return; }
+  if (req2.method === 'OPTIONS') { res.status(204).end(); return; }
 
-  const url = new URL(req.url, `https://${req.headers.host}`);
+  const url = new URL(req2.url, `https://${req2.headers.host}`);
   const way2path = url.searchParams.get('path');
 
-  // Status/ping
   if (!way2path || way2path === 'status') {
-    // Testa se a sessão ainda é válida
-    try {
-      const r = await httpsReq({
-        hostname: WAY2_HOST, path: '/api/medicao/realtime', method: 'GET',
-        headers: {
-          'Cookie': STATIC_COOKIES,
-          'User-Agent': 'Mozilla/5.0',
-          'Accept': 'application/json, */*',
-        }
-      });
-      const ok = r.status !== 401 && r.status !== 302 && r.status < 500;
-      console.log('[Way2] Status check:', r.status, ok ? 'OK' : 'FALHOU');
-      res.status(200).json({ ok, user: USERNAME, session: ok, httpStatus: r.status });
-    } catch(e) {
-      res.status(200).json({ ok: false, user: USERNAME, error: e.message });
-    }
+    const ok = await ensureSession();
+    res.status(200).json({ ok, user: USERNAME, cookies: Object.keys(jar), ts: new Date().toISOString() });
     return;
   }
 
-  // Proxy para Way2
   try {
-    const r = await httpsReq({
-      hostname: WAY2_HOST,
-      path: '/' + way2path,
-      method: 'GET',
+    await ensureSession();
+    const r = await req({
+      hostname: WAY2_HOST, path: '/' + way2path, method: 'GET',
       headers: {
-        'Cookie': STATIC_COOKIES,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Cookie': cookieStr(),
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Accept': 'application/json, text/html, */*',
         'Referer': `https://${WAY2_HOST}/`,
         'X-Requested-With': 'XMLHttpRequest',
       }
     });
-
-    console.log(`[Way2] GET /${way2path} → ${r.status}`);
-    res.status(r.status)
-       .setHeader('Content-Type', 'application/json')
-       .send(r.body);
+    parseCookies(r.headers);
+    if (r.status === 401 || r.status === 302) {
+      jar = {}; lastLogin = 0;
+      await login();
+    }
+    res.status(r.status).setHeader('Content-Type', 'application/json').send(r.body);
   } catch(e) {
-    console.error('[Way2] Erro:', e.message);
     res.status(500).json({ error: e.message });
   }
 };
