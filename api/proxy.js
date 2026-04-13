@@ -1,90 +1,24 @@
 const https = require('https');
-const qs = require('querystring');
 
 const WAY2_HOST = 'pim.way2.com.br';
-const USERNAME  = 'leandro.souzagna';
-const PASSWORD  = 'Mudar@2026';
-const SESSION_TTL = 20 * 60 * 1000;
 
-let sessionCookies = '';
-let lastLogin = 0;
+// Cookies de sessão capturados do navegador
+// ATENÇÃO: Quando expirar, atualize estes valores com os novos cookies do navegador
+const STATIC_COOKIES = '.ASPXAUTH=E5EE983722A89C532295C3018E4C15C86D7E86CA2DEFEF09AB76672385562051012E395D9D4BB82476E38AE80C9F1F125D839F9B4EE5B397C0BE8C70E8A3B3715A1B2F301B73AF70BAF6E5CE0BFB6101599AC033F4EEFD3C674611402FD8DE9A2C5C98EB63ECB35D6D8D416105F3D5F4; ASP.NET_SessionId=gobfllvftiqb4khnzsnikmk5';
 
-function httpsReq(options, body = null) {
+const USERNAME = 'leandro.souzagna';
+
+function httpsReq(opts) {
   return new Promise((resolve, reject) => {
-    const req = https.request(options, res => {
+    const req = https.request(opts, res => {
       let data = '';
       res.on('data', c => data += c);
       res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: data }));
     });
     req.on('error', reject);
-    if (body) req.write(body);
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
     req.end();
   });
-}
-
-function parseCookies(setCookie) {
-  if (!setCookie) return '';
-  const arr = Array.isArray(setCookie) ? setCookie : [setCookie];
-  return arr.map(c => c.split(';')[0]).join('; ');
-}
-
-async function login() {
-  console.log('[Auth] Fazendo login em', WAY2_HOST, 'com usuário', USERNAME);
-  const body = qs.stringify({ username: USERNAME, password: PASSWORD });
-  try {
-    const r = await httpsReq({
-      hostname: WAY2_HOST, path: '/login', method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(body),
-        'User-Agent': 'Mozilla/5.0',
-        'Accept': 'text/html,*/*',
-      }
-    }, body);
-    const cookies = parseCookies(r.headers['set-cookie']);
-    if (cookies) {
-      sessionCookies = cookies;
-      lastLogin = Date.now();
-      console.log('[Auth] Login OK! Status:', r.status);
-      return true;
-    }
-    if (r.status >= 301 && r.status <= 303) {
-      const c2 = parseCookies(r.headers['set-cookie']);
-      if (c2) { sessionCookies = c2; lastLogin = Date.now(); return true; }
-    }
-  } catch(e) {
-    console.error('[Auth] Erro form login:', e.message);
-  }
-  try {
-    const jbody = JSON.stringify({ username: USERNAME, password: PASSWORD });
-    const r2 = await httpsReq({
-      hostname: WAY2_HOST, path: '/api/login', method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(jbody),
-        'User-Agent': 'Mozilla/5.0',
-      }
-    }, jbody);
-    const c2 = parseCookies(r2.headers['set-cookie']);
-    let payload = {};
-    try { payload = JSON.parse(r2.body); } catch {}
-    const token = payload.token || payload.access_token || '';
-    if (c2 || token) {
-      sessionCookies = c2 || `token=${token}`;
-      lastLogin = Date.now();
-      console.log('[Auth] Login OK via JSON!');
-      return true;
-    }
-  } catch(e) {
-    console.error('[Auth] Erro JSON login:', e.message);
-  }
-  console.error('[Auth] Login falhou!');
-  return false;
-}
-
-async function ensureSession() {
-  if (sessionCookies && Date.now() - lastLogin < SESSION_TTL) return true;
-  return await login();
 }
 
 module.exports = async (req, res) => {
@@ -96,33 +30,48 @@ module.exports = async (req, res) => {
   const url = new URL(req.url, `https://${req.headers.host}`);
   const way2path = url.searchParams.get('path');
 
+  // Status/ping
   if (!way2path || way2path === 'status') {
-    const ok = await ensureSession();
-    res.status(200).json({ ok, user: USERNAME, session: !!sessionCookies });
+    // Testa se a sessão ainda é válida
+    try {
+      const r = await httpsReq({
+        hostname: WAY2_HOST, path: '/api/medicao/realtime', method: 'GET',
+        headers: {
+          'Cookie': STATIC_COOKIES,
+          'User-Agent': 'Mozilla/5.0',
+          'Accept': 'application/json, */*',
+        }
+      });
+      const ok = r.status !== 401 && r.status !== 302 && r.status < 500;
+      console.log('[Way2] Status check:', r.status, ok ? 'OK' : 'FALHOU');
+      res.status(200).json({ ok, user: USERNAME, session: ok, httpStatus: r.status });
+    } catch(e) {
+      res.status(200).json({ ok: false, user: USERNAME, error: e.message });
+    }
     return;
   }
 
+  // Proxy para Way2
   try {
-    const ok = await ensureSession();
-    if (!ok) { res.status(401).json({ error: 'Login na Way2 falhou' }); return; }
-
     const r = await httpsReq({
       hostname: WAY2_HOST,
       path: '/' + way2path,
       method: 'GET',
       headers: {
-        'Cookie': sessionCookies,
-        'User-Agent': 'Mozilla/5.0',
-        'Accept': 'application/json, */*',
+        'Cookie': STATIC_COOKIES,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json, text/html, */*',
+        'Referer': `https://${WAY2_HOST}/`,
+        'X-Requested-With': 'XMLHttpRequest',
       }
     });
 
-    const nc = parseCookies(r.headers['set-cookie']);
-    if (nc) { sessionCookies = nc; lastLogin = Date.now(); }
-    if (r.status === 401 || r.status === 403) { sessionCookies = ''; lastLogin = 0; }
-
-    res.status(r.status).setHeader('Content-Type', 'application/json').send(r.body);
-  } catch (e) {
+    console.log(`[Way2] GET /${way2path} → ${r.status}`);
+    res.status(r.status)
+       .setHeader('Content-Type', 'application/json')
+       .send(r.body);
+  } catch(e) {
+    console.error('[Way2] Erro:', e.message);
     res.status(500).json({ error: e.message });
   }
 };
