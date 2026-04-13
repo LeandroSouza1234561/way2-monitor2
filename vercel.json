@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "proxy.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/proxy.js" }
-  ]
+  "functions": {
+    "api/proxy.js": {
+      "memory": 128,
+      "maxDuration": 15
+    }
+  }
 }
