@@ -145,28 +145,140 @@ footer{background:#1a1e2a;border-top:2px solid #c06010;height:28px;flex-shrink:0
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const PROXY='https://way2-monitor2.vercel.app';
-const MED={GNA1:[{id:'UTENovoTempo_UG01',nome:'GT11',nom:185,lado:1},{id:'UTENovoTempo_UG02',nome:'GT12',nom:185,lado:1},{id:'UTENovoTempo_UG03',nome:'GT13',nom:185,lado:1},{id:'UTENovoTempo_UG04',nome:'ST10',nom:353,lado:1}],GNA2:[{id:'UTEGNAII_UG1',nome:'GT21',nom:440,lado:2},{id:'UTEGNAII_UG2',nome:'GT22',nom:440,lado:2},{id:'UTEGNAII_UG3',nome:'GT23',nom:440,lado:2},{id:'UTEGNAII_UG4',nome:'ST20',nom:353,lado:2}]};
+
+// Medidores com IDs reais capturados do Way2
+const MED={
+  GNA1:[
+    {id:'2562',nome:'GT11',nom:185,lado:1},
+    {id:'2565',nome:'GT12',nom:185,lado:1},
+    {id:'2566',nome:'GT13',nom:185,lado:1},
+    {id:'2567',nome:'ST10',nom:353,lado:1}
+  ],
+  GNA2:[
+    {id:'5679',nome:'GT21',nom:440,lado:2},
+    {id:'5690',nome:'GT22',nom:440,lado:2},
+    {id:'5691',nome:'GT23',nom:440,lado:2},
+    {id:'5693',nome:'ST20',nom:353,lado:2}
+  ]
+};
+
+// grandezas=7 = MW (capturado da URL real do Way2)
+const GRANDEZA = 7;
+
 const R={};let cd=10,cdId=null;const CH={};
 setInterval(()=>document.getElementById('clk').textContent=new Date().toLocaleTimeString('pt-BR'),1000);
+
 function mkL(id,c){return new Chart(document.getElementById(id),{type:'line',data:{labels:Array(20).fill(''),datasets:[{data:Array(20).fill(0),borderColor:c,borderWidth:1.5,fill:true,backgroundColor:c+'25',tension:.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:400}}})}
 function mkE(id,c){return new Chart(document.getElementById(id),{type:'line',data:{labels:['I','II','III','M','I','V','VI','M'],datasets:[{data:[88,90,92,91,93,91,94,95],borderColor:c,borderWidth:1.5,fill:true,backgroundColor:c+'30',tension:.4,pointRadius:2,pointBackgroundColor:c}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5060',font:{size:7}},grid:{color:'rgba(0,0,0,.1)'}},y:{min:70,max:100,ticks:{color:'#4a5060',font:{size:7},callback:v=>v+'%'},grid:{color:'rgba(0,0,0,.1)'}}},animation:{duration:400}}})}
 function ap(k,v){const c=CH[k];if(!c)return;c.data.datasets[0].data.push(v);if(c.data.datasets[0].data.length>20)c.data.datasets[0].data.shift();c.data.labels=c.data.datasets[0].data.map((_,i)=>i);c.update('none')}
 window.addEventListener('load',()=>{CH.tot=mkL('ch-tot','#f5a020');CH.g1=mkL('ch-g1','#6aaad8');CH.g2=mkL('ch-g2','#ffe090');CH.e1=mkE('ch-efic','#c06010');CH.e2=mkE('ch-efic2','#c06010')});
+
 async function init(){
   setMsg('Conectando ao proxy...');
   try{
     const r=await fetch(`${PROXY}/api/proxy?path=status`,{signal:AbortSignal.timeout(8000)});
     const d=await r.json();
-    if(d.ok){setMsg('Carregando...');document.getElementById('ls').style.display='none';document.getElementById('app').style.display='flex';await fetchAll();setInterval(fetchAll,10000);startCD();}
-    else throw 0;
+    if(d.ok){
+      setMsg('Carregando dados...');
+      document.getElementById('ls').style.display='none';
+      document.getElementById('app').style.display='flex';
+      await fetchAll();
+      setInterval(fetchAll,10000);
+      startCD();
+    } else throw 0;
   }catch{setMsg('❌ Proxy offline. Verifique o deploy na Vercel.');}
 }
+
 function setMsg(t){document.getElementById('lsmsg').textContent=t}
-async function fetchAll(){document.getElementById('ft-txt').textContent='Buscando dados...';cd=10;await Promise.allSettled([...MED.GNA1,...MED.GNA2].map(fetchOne));updateUI();document.getElementById('ft-txt').textContent='Atualizado: '+new Date().toLocaleTimeString('pt-BR');}
-async function fetchOne(m){const ps=[`api/tempo-real/${m.id}?grandeza=MW`,`api/v1/realtime?medidor=${m.id}&grandeza=MW`,`api/leituras?medidor=${m.id}&grandeza=MW`,`api/pontos/${m.id}/leitura`];for(const p of ps){try{const r=await fetch(`${PROXY}/api/proxy?path=${encodeURIComponent(p)}`,{signal:AbortSignal.timeout(6000)});if(!r.ok)continue;const d=await r.json();const mw=xMW(d);if(mw!==null){R[m.id]={mw,status:'online'};return;}}catch{}}R[m.id]={mw:null,status:'offline'};}
-function xMW(d){if(typeof d==='number')return d;for(const k of['MW','mw','value','valor','leitura','medicao','potencia','active_power']){if(d[k]!=null){const v=+d[k];if(!isNaN(v))return v;}}if(Array.isArray(d)&&d.length)return xMW(d[0]);if(d.data)return xMW(d.data);return null;}
-function updateUI(){let s1=0,s2=0;MED.GNA1.forEach(m=>{const r=R[m.id];if(r?.status==='online'&&r.mw!=null)s1+=r.mw;upCard(m,r);});MED.GNA2.forEach(m=>{const r=R[m.id];if(r?.status==='online'&&r.mw!=null)s2+=r.mw;upCard(m,r);});const tot=s1+s2;document.getElementById('total-mw').textContent=fmt(tot);document.getElementById('soma-g1').innerHTML=fmt(s1)+'<span>MW</span>';document.getElementById('soma-g2').innerHTML=fmt(s2)+'<span>MW</span>';document.getElementById('mc-g1').textContent=fmt(s1)+' MW';document.getElementById('mc-g2').textContent=fmt(s2)+' MW';document.getElementById('mc-ef').textContent=fmt(tot)+' MW';ap('tot',tot);ap('g1',s1);ap('g2',s2);}
-function upCard(m,r){const dot=document.getElementById(`dot-${m.nome}`);const val=document.getElementById(`val-${m.nome}`);const bar=document.getElementById(`bar-${m.nome}`);if(!dot)return;const st=r?.status||'loading';const mw=r?.mw??null;const pct=mw!=null?Math.min(100,(mw/m.nom)*100).toFixed(1):0;const sc=st==='online'?'on':st==='offline'?'of':'ld';dot.className=`tc-dot s-${sc}`;val.className=`tc-mw v-${sc}-${m.lado}`;val.textContent=mw!=null?fmt(mw):st==='offline'?'–':'…';bar.className=`tc-bar b-${sc}`;bar.style.width=pct+'%';}
+
+async function fetchAll(){
+  document.getElementById('ft-txt').textContent='Buscando dados...';
+  cd=10;
+
+  // Usa o endpoint real do Way2: /AreaTempoReal/AcompanhamentoTempoReal/Liste
+  const todos=[...MED.GNA1,...MED.GNA2];
+  const params=todos.map(m=>`medidores=${m.id}`).join('&');
+  const url=`AreaTempoReal/AcompanhamentoTempoReal/Liste?primeiraLeitura=true&${params}&grandezas=${GRANDEZA}`;
+
+  try{
+    const r=await fetch(`${PROXY}/api/proxy?path=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(10000)});
+    if(r.ok){
+      const data=await r.json();
+      processData(data,todos);
+    }
+  }catch(e){
+    console.error('fetchAll error:',e);
+    todos.forEach(m=>{ R[m.id]={mw:null,status:'offline'}; });
+  }
+
+  updateUI();
+  document.getElementById('ft-txt').textContent='Atualizado: '+new Date().toLocaleTimeString('pt-BR');
+}
+
+function processData(data,todos){
+  // A resposta do Way2 é um array de objetos com medidores e seus valores
+  console.log('Way2 response:', JSON.stringify(data).substring(0,300));
+  const list=Array.isArray(data)?data:(data.data||data.items||data.leituras||data.medidores||[]);
+  
+  todos.forEach(m=>{
+    // Tenta encontrar o medidor pelo ID
+    const item=list.find(i=>
+      String(i.id||i.medidorId||i.MedidorId||i.codigo||'')===String(m.id)||
+      String(i.nome||i.Name||i.medidor||'').includes(m.nome)
+    );
+    if(item){
+      const mw=extractMW(item);
+      R[m.id]={mw,status:mw!==null?'online':'offline'};
+    } else {
+      R[m.id]={mw:null,status:'offline'};
+    }
+  });
+}
+
+function extractMW(d){
+  if(typeof d==='number')return d;
+  for(const k of['MW','mw','value','valor','leitura','medicao','potencia','active_power','valorAtual','ValorAtual','grandeza','Grandeza']){
+    if(d[k]!=null){const v=+d[k];if(!isNaN(v))return v;}
+  }
+  if(d.grandezas&&Array.isArray(d.grandezas)&&d.grandezas[0]!=null){
+    const v=+d.grandezas[0];if(!isNaN(v))return v;
+  }
+  if(d.valores&&Array.isArray(d.valores)&&d.valores[0]!=null){
+    const v=+d.valores[0];if(!isNaN(v))return v;
+  }
+  return null;
+}
+
+function updateUI(){
+  let s1=0,s2=0;
+  MED.GNA1.forEach(m=>{const r=R[m.id];if(r?.status==='online'&&r.mw!=null)s1+=r.mw;upCard(m,r);});
+  MED.GNA2.forEach(m=>{const r=R[m.id];if(r?.status==='online'&&r.mw!=null)s2+=r.mw;upCard(m,r);});
+  const tot=s1+s2;
+  document.getElementById('total-mw').textContent=fmt(tot);
+  document.getElementById('soma-g1').innerHTML=fmt(s1)+'<span>MW</span>';
+  document.getElementById('soma-g2').innerHTML=fmt(s2)+'<span>MW</span>';
+  document.getElementById('mc-g1').textContent=fmt(s1)+' MW';
+  document.getElementById('mc-g2').textContent=fmt(s2)+' MW';
+  document.getElementById('mc-ef').textContent=fmt(tot)+' MW';
+  ap('tot',tot);ap('g1',s1);ap('g2',s2);
+}
+
+function upCard(m,r){
+  const dot=document.getElementById(`dot-${m.nome}`);
+  const val=document.getElementById(`val-${m.nome}`);
+  const bar=document.getElementById(`bar-${m.nome}`);
+  if(!dot)return;
+  const st=r?.status||'loading';
+  const mw=r?.mw??null;
+  const pct=mw!=null?Math.min(100,(mw/m.nom)*100).toFixed(1):0;
+  const sc=st==='online'?'on':st==='offline'?'of':'ld';
+  dot.className=`tc-dot s-${sc}`;
+  val.className=`tc-mw v-${sc}-${m.lado}`;
+  val.textContent=mw!=null?fmt(mw):st==='offline'?'–':'…';
+  bar.className=`tc-bar b-${sc}`;
+  bar.style.width=pct+'%';
+}
+
 function fmt(n){if(n==null||isNaN(n))return'–';return n.toLocaleString('pt-BR',{maximumFractionDigits:1})}
 function startCD(){cd=10;clearInterval(cdId);cdId=setInterval(()=>{cd--;document.getElementById('prog').style.width=((cd/10)*100)+'%';if(cd<=0)cd=10},1000)}
 init();
