@@ -515,46 +515,26 @@ async function fetchAll() {
 }
 
 function processData(data, todos) {
-  const list = Array.isArray(data) ? data : (data.data || data.items || data.leituras || data.medidores || data.lista || []);
-  console.log('[Way2] Response tipo:', typeof data, '| lista len:', list.length, '| preview:', JSON.stringify(data).substring(0, 400));
+  // Estrutura real: { content: [{ registros: [...] }] }
+  const registros = data?.content?.[0]?.registros || [];
+  console.log('[Way2] registros:', registros.length);
 
   todos.forEach(m => {
-    // Tenta encontrar pelo ID numérico ou nome
-    const item = list.find(i =>
-      String(i.id || i.medidorId || i.MedidorId || i.Id || '') === String(m.id) ||
-      String(i.nome || i.Name || i.name || i.descricao || '').toUpperCase().includes(m.nome.toUpperCase())
-    );
-    if (item) {
-      const mw = extractMW(item);
-      R[m.id] = {mw, status: mw !== null ? 'online' : 'offline'};
+    const reg = registros.find(r => String(r.medidorId) === String(m.id));
+    if (reg) {
+      const mw = reg.potenciaAtiva != null ? +reg.potenciaAtiva : null;
+      const statusTxt = reg.status?.item2 || 'Offline';
+      const status = statusTxt === 'Online' ? 'online' : statusTxt === 'Carregando' ? 'loading' : 'offline';
+      R[m.id] = {mw, status};
     } else {
-      // Tenta pelo índice se a lista vier na mesma ordem
-      const idx = todos.indexOf(m);
-      if (list[idx]) {
-        const mw = extractMW(list[idx]);
-        R[m.id] = {mw, status: mw !== null ? 'online' : 'offline'};
-      } else {
-        R[m.id] = {mw: null, status: 'offline'};
-      }
+      R[m.id] = {mw: null, status: 'offline'};
     }
   });
 }
 
 function extractMW(d) {
   if (typeof d === 'number') return d;
-  const keys = ['MW','mw','value','valor','leitura','medicao','potencia','active_power','valorAtual','ValorAtual','Value','Valor'];
-  for (const k of keys) {
-    if (d[k] != null) { const v = +d[k]; if (!isNaN(v)) return v; }
-  }
-  // Tenta grandezas como array
-  if (d.grandezas && Array.isArray(d.grandezas) && d.grandezas.length > 0) {
-    const g = d.grandezas[0];
-    if (typeof g === 'number') return g;
-    if (g && g.valor != null) return +g.valor;
-  }
-  if (d.valores && Array.isArray(d.valores) && d.valores.length > 0) {
-    const v = +d.valores[0]; if (!isNaN(v)) return v;
-  }
+  if (d.potenciaAtiva != null) return +d.potenciaAtiva;
   return null;
 }
 
